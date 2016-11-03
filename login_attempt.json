@@ -1,0 +1,24 @@
+{
+	"mappings": {
+		"_default_": {
+			"properties": {
+				"intrusion_username": {
+					"type": "string", 
+					"index": "not_analyzed"
+				},
+				"intrusion_password": {
+					"type": "string",
+					"index": "not_analyzed"
+				},
+				"intrusion_timestamp": {
+					"type": "date",
+					"index": "not_analyzed"
+				},
+				"intrusion_originating_ip": {
+					"type": "string",
+					"index": "not_analyzed"
+				}
+			}
+		}
+	}
+}
