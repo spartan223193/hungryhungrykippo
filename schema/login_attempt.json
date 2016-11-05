@@ -10,8 +10,16 @@
 					"type": "string",
 					"index": "not_analyzed"
 				},
-				"intrusion_timestamp": {
+				"intrusion_date": {
 					"type": "date",
+					"index": "not_analyzed"
+				},
+				"intrusion_time": {
+					"type": "date",
+					"index": "not_analyzed"
+				},
+				"intrusion_timezone": {
+					"type": "string",
 					"index": "not_analyzed"
 				},
 				"intrusion_originating_ip": {
