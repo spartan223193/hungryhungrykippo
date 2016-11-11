@@ -13,6 +13,13 @@ class KippoParser(object):
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
+    @staticmethod
+    def dict_converter(x):
+        if isinstance(x, dict):
+            return x
+        else:
+            return x.__dict__
+
     def write_kippo_json_to_file(self, log_path, output_path):
         '''
         Parse kippo log into JSON and output to a file
@@ -24,9 +31,10 @@ class KippoParser(object):
 
         with open(output_path, 'w') as output_file:
             json_logs = self.parse_log_file_to_json_kippo_objects(log_path)
-            output_file.write(json_logs)
+            for log in json_logs:
+                output_file.write(log)
 
-    def parse_log_file_to_json_kippo_objects(self, log_path):
+    def parse_log_file_to_json_kippo_objects(self, log_path, create_new=True):
         '''
         Parse a log file into JSON Kippo Objects
 
@@ -35,10 +43,24 @@ class KippoParser(object):
         '''
         logging.info('Creating JSON kippo objects for {}'.format(log_path))
         kippo_objects = self.parse_log_file_to_kippo_objects(log_path)
-        kippo_objects = map(lambda x: x.__dict__, kippo_objects)
-        kippo_json_string = json.dumps(kippo_objects)
+        kippo_objects = map(self.dict_converter, kippo_objects)
+        kippo_json_strings = deque()
+        for kippo_object in kippo_objects:
+            if create_new:
+                kippo_json_strings.append(self._add_create_json())
+            kippo_json_strings.append(json.dumps(kippo_object)+'\n')
         logging.info('Successfully generated Kippo JSON string')
-        return kippo_json_string
+        return kippo_json_strings
+
+    def _add_create_json(self, index='kippo', item_type='intrusion_attempt'):
+        '''
+        Creates a JSON create line for elasticsearch
+
+        :param index:
+        :param item_type:
+        :return: String
+        '''
+        return json.dumps({'create': {'_index': index, '_type': item_type}})+'\n'
 
     def parse_log_file_to_kippo_objects(self, log_path):
         '''
@@ -66,7 +88,7 @@ class KippoParser(object):
                 attempt.intrusion_password = credentials['password']
                 attempt.intrusion_originating_ip = ip_address
                 attempt.intrusion_date = timestamp['date']
-                attempt.intrusion_time = timestamp['time']
+                attempt.intrusion_time = timestamp['time'].replace(':','')
                 attempt.intrusion_timezone = timestamp['timezone']
                 models.append(attempt)
 
