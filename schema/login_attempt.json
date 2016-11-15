@@ -23,7 +23,7 @@
 					"index": "not_analyzed"
 				},
 				"intrusion_originating_ip": {
-					"type": "string",
+					"type": "ip",
 					"index": "not_analyzed"
 				}
 			}
